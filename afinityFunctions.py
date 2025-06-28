@@ -102,13 +102,13 @@ def obtainBackground(iPj: Character):
 # OBTENER HABILIDADES (S11)
 def obtainProficiencies(iPj: Character):
    # Un pj tiene las habilidades que da trasfondo y raza
-   setAbilities = rules.obtainSkills(rules.Tipo.BACKGROUND, iPj.background).union(
-                  rules.obtainSkills(rules.Tipo.RACE, iPj.race))
+   setAbilities = rules.getSkills(rules.Type.BACKGROUND, iPj.background).union(
+                  rules.getSkills(rules.Type.RACE, iPj.race))
    
    # Obtenemos las habilidades que podemos escoger
-   abilitiesToChoose = rules.obtainSkills(rules.Tipo.CLASS, iPj.job)
+   abilitiesToChoose = rules.getSkills(rules.Type.CLASS, iPj.job)
    abilitiesToChoose.difference_update(setAbilities)
-   nAbilitiesToChoose = rules.obtainNumClassProficiencies(iPj.job)
+   nAbilitiesToChoose = rules.getNumClassProficiencies(iPj.job)
 
    rolesForProficiencies = ["Cara a cara", "Erudición", "Exploración", "Utilidad"]
    etaSH = []
@@ -116,13 +116,13 @@ def obtainProficiencies(iPj: Character):
       if (rol in rolesForProficiencies):
          etaSH.append(reader.searchInTable('.\Tablas.xlsx', 'eta(S,H)', rol))
 
-   etaSH = reader.normalize(etaSH).A[0]
-   pointsAbilitesNorm = reader.normalize(iPj.abilityPoints).A[0]
+   etaSH = reader.normalizeArray(etaSH).A[0]
+   pointsAbilitesNorm = reader.normalizeArray(iPj.abilityPoints).A[0]
 
-   caract = rules.abilities()
+   caract = rules.getAbilities()
    phiNotZeroH = []
    for i in range(len(caract)):
-      hab = rules.obtainSkills(rules.Tipo.ABILITY, caract[i])
+      hab = rules.getSkills(rules.Type.ABILITY, caract[i])
       for h in hab:
          phiNotZeroH.append(pointsAbilitesNorm[i])
 
@@ -131,11 +131,11 @@ def obtainProficiencies(iPj: Character):
    elif(2 == len(etaSH)):
       phiNotZeroH = phiNotZeroH + iPj.coefRoles * etaSH[0] + (1 - iPj.coefRoles) * etaSH[1]
    
-   phiNotZeroH = reader.normalize(phiNotZeroH).A[0]
+   phiNotZeroH = reader.normalizeArray(phiNotZeroH).A[0]
 
    # Habilidad que no podemos seleccionar -> phiH(hablidad) = 0
-   dictPhiH = {rules.skills()[i]: phiNotZeroH[i] for i in range(len(phiNotZeroH))}
-   notAbilitiesToChoose = set(rules.skills()).difference(abilitiesToChoose)
+   dictPhiH = {rules.getAllSkills()[i]: phiNotZeroH[i] for i in range(len(phiNotZeroH))}
+   notAbilitiesToChoose = set(rules.getAllSkills()).difference(abilitiesToChoose)
    for hab in notAbilitiesToChoose:
       dictPhiH[hab] = 0
    phiH = list(dictPhiH.values())
@@ -156,13 +156,13 @@ def obtainProficiencies(iPj: Character):
    
    for i in range(18):
       if (1.0 == x[i].value[0]):
-         setAbilities.add(rules.skills()[i])
+         setAbilities.add(rules.getAllSkills()[i])
 
    # Si la raza es semielfo, se escogen 2 hab adicionales de entre todas
    if ("Semielfo" == iPj.race):
       nAbilitiesToChoose = 2
-      dictPhiH = {rules.skills()[i]: phiNotZeroH[i] for i in range(len(phiNotZeroH))}
-      notAbilitiesToChoose = set(rules.skills()).difference(setAbilities)
+      dictPhiH = {rules.getAllSkills()[i]: phiNotZeroH[i] for i in range(len(phiNotZeroH))}
+      notAbilitiesToChoose = set(rules.getAllSkills()).difference(setAbilities)
       for hab in notAbilitiesToChoose:
          dictPhiH[hab] = 0
       phiH = list(dictPhiH.values())
@@ -178,7 +178,7 @@ def obtainProficiencies(iPj: Character):
       
       for i in range(18):
          if (1.0 == x[i].value[0]):
-            setAbilities.add(rules.skills()[i])
+            setAbilities.add(rules.getAllSkills()[i])
 
    return setAbilities
 

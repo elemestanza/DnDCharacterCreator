@@ -4,58 +4,39 @@ from enum import Enum
 import pandas as pd
 import numpy as np
 
-class Modo(Enum):
+class Mode(Enum):
    ROW    = 0
    COLUMN = 1
 
-class Tipo(Enum):
+class TextType(Enum):
    NUM = 0
    TEXT = 1
 
-def obtainRawTable(iFile: str, iSheet: str, iType = Tipo.NUM):
-   with pd.ExcelFile(iFile) as xlsxFile:
-      excelReader = pd.read_excel(xlsxFile, iSheet, index_col=0)
-      if(Tipo.NUM == iType):
-         table = np.zeros(excelReader.shape)
-      else:
-         table = [[""] * excelReader.shape[1]]  * excelReader.shape[0]
-      nCol = 0
-      for col in excelReader:
-         nRow = 0
-         for cell in excelReader[col]:
-            if(pd.isna(cell)):
-               table[nRow][nCol] = 0
-            else:
-               table[nRow][nCol] = cell
-            nRow += 1
-         nCol += 1
-   return table
-
-def normalize(oArray, iSearchMode = Modo.ROW):
+def normalizeArray(oArray, iSearchMode = Mode.ROW):
    arraySum = np.sum(oArray)
    oArray = np.asmatrix(np.divide(oArray, arraySum))
 
-   if(Modo.ROW == iSearchMode):
+   if(Mode.ROW == iSearchMode):
       return oArray
    else:
       return np.transpose(oArray)
 
 def searchInTable(iFile: str, iSheet: str,
-                  iParamToSearch, iMode = Modo.ROW, iType = Tipo.NUM):
+                  iParamToSearch, iMode = Mode.ROW, iType = TextType.NUM):
    with pd.ExcelFile(iFile) as xlsxFile:
       excelReader = pd.read_excel(xlsxFile, iSheet, index_col=0)
-      if(Modo.ROW == iMode):
+      if(Mode.ROW == iMode):
          arraySize = len(excelReader.columns)
       else:
          arraySize = len(excelReader[iParamToSearch])
       
-      if(Tipo.NUM == iType):
+      if(TextType.NUM == iType):
          array = np.zeros(arraySize)
       else:
          array = [""] * arraySize
       
       i = 0
-      if(Modo.ROW == iMode):
+      if(Mode.ROW == iMode):
          for col in excelReader:
             if(pd.isna(excelReader[col][iParamToSearch])):
                array[i] = 0
@@ -70,8 +51,8 @@ def searchInTable(iFile: str, iSheet: str,
                array[i] = excelReader[iParamToSearch][i]
             i += 1
    
-   if(Tipo.NUM == iType):
-      return normalize(array, iMode)
+   if(TextType.NUM == iType):
+      return normalizeArray(array, iMode)
    else:
       return array
 

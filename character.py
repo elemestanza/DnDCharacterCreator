@@ -17,7 +17,7 @@ class Character():
    magic = list()
    modifiers = list()
 
-   def obtainModifiers(self):
+   def getModifiers(self):
       intMod = []
       strMod = []
       for punt in self.abilityPoints:
@@ -47,8 +47,8 @@ class Character():
       self.magic = phi.obtainMagic(self)
 
    def __str__(self):
-      self.modifiers = self.obtainModifiers()
-      abilityNames = rules.abilities()
+      self.modifiers = self.getModifiers()
+      abilityNames = rules.getAbilities()
       strReturn = "Nombre: " + self.name + "\n" +\
             "Raza: " + self.race + "\n" +\
             "Clase: " + self.job + "\n" +\
